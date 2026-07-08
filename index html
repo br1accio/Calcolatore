@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calcolatore</title>
+  <style>
+    :root {
+      --bg1: #f8fafc;
+      --bg2: #edf4ff;
+      --panel: rgba(255,255,255,.88);
+      --panel-border: rgba(255,255,255,.78);
+      --text: #0f172a;
+      --muted: #64748b;
+      --input-bg: #fff8db;
+      --input-border: #f3d27a;
+      --input-focus: #f0b429;
+      --success-bg: #ecfdf5;
+      --success-border: #a7f3d0;
+      --success-text: #047857;
+      --info-bg: #eff6ff;
+      --info-border: #bfdbfe;
+      --info-text: #1d4ed8;
+      --button-bg: #0f172a;
+      --button-text: #ffffff;
+      --button-soft: #e2e8f0;
+      --button-soft-text: #0f172a;
+      --card-shadow: 0 12px 32px rgba(15, 23, 42, .10);
+      --radius-xl: 28px;
+      --radius-md: 16px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(14,165,233,.10), transparent 28%),
+        radial-gradient(circle at top right, rgba(16,185,129,.10), transparent 24%),
+        linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 0 0 20px;
+    }
+
+    .section-head {
+      margin: 10px 0 16px;
+    }
+
+    .section-head p {
+      margin: 0 0 4px;
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      font-weight: 800;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: clamp(26px, 3vw, 34px);
+      line-height: 1.1;
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: 1fr;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .card-top h3 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    .card-top p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .icon-amber { background: #fef3c7; color: #b45309; }
+    .icon-sky { background: #e0f2fe; color: #0369a1; }
+    .icon-violet { background: #ede9fe; color: #6d28d9; }
+    .icon-green { background: #dcfce7; color: #15803d; }
+    .icon-cyan { background: #cffafe; color: #0f766e; }
+    .icon-rose { background: #ffe4e6; color: #be123c; }
+
+    .fields.two, .fields.one {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr;
+    }
+
+    label { display: block; }
+
+    label span {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      border-radius: var(--radius-md);
+      padding: 14px 15px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      outline: none;
+      transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--input-focus);
+      box-shadow: 0 0 0 4px rgba(240,180,41,.18);
+      background: #fffef7;
+    }
+
+    .result {
+      margin-top: 16px;
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid var(--success-border);
+      background: var(--success-bg);
+    }
+
+    .result.secondary {
+      border-color: var(--info-border);
+      background: var(--info-bg);
+    }
+
+    .result-label {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      color: #065f46;
+    }
+
+    .result.secondary .result-label { color: var(--info-text); }
+
+    .result-value {
+      font-size: clamp(24px, 4vw, 32px);
+      line-height: 1;
+      font-weight: 900;
+      color: var(--success-text);
+      text-align: right;
+      word-break: break-word;
+    }
+
+    .result.secondary .result-value { color: var(--info-text); }
+
+    .split-results {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 11px 16px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--button-bg);
+      color: var(--button-text);
+    }
+
+    .btn-soft {
+      background: var(--button-soft);
+      color: var(--button-soft-text);
+    }
+
+    @media (min-width: 700px) {
+      .fields.two { grid-template-columns: 1fr 1fr; }
+      .split-results { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (min-width: 900px) {
+      .grid.three { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (min-width: 1100px) {
+      .grid.three { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="toolbar">
+      <button class="btn-primary" onclick="resetAll()">Reset tutto</button>
+      <button class="btn-soft" onclick="fillDemo()">Carica esempio</button>
+    </div>
+
+    <section>
+      <div class="section-head">
+        <p>Area 1</p>
+        <h2>Percentuali base</h2>
+      </div>
+
+      <div class="grid three">
+        <article class="card">
+          <div class="card-top">
+            <div>
+              <h3>Percentuale diretta</h3>
+              <p>Quanto vale una percentuale di un totale.</p>
+            </div>
+            <div class="icon icon-amber">%</div>
+          </div>
+          <div class="fields two">
+            <label><span>Percentuale (%)</span><input type="number" id="c1_p" placeholder="25" oninput="calcolaCard1()"></label>
+            <label><span>Totale</span><input type="number" id="c1_t" placeholder="11400" oninput="calcolaCard1()"></label>
+          </div>
+          <div class="result"><div class="result-label">Risultato</div><div id="c1_res" class="result-value">0</div></div>
+          <div class="actions"><button class="btn-soft" onclick="resetCard(['c1_p','c1_t'], ['c1_res'], ['0'])">Pulisci</button></div>
+        </article>
+
+        <article class="card">
+          <div class="card-top">
+            <div>
+              <h3>Incidenza percentuale</h3>
+              <p>Che percentuale rappresenta un valore.</p>
+            </div>
+            <div class="icon icon-sky">≈</div>
+          </div>
+          <div class="fields two">
+            <label><span>Valore</span><input type="number" id="c2_v1" placeholder="188" oninput="calcolaCard2()"></label>
+            <label><span>Totale</span><input type="number" id="c2_v2" placeholder="10000" oninput="calcolaCard2()"></label>
+          </div>
+          <div class="result"><div class="result-label">Risultato</div><div id="c2_res" class="result-value">0%</div></div>
+          <div class="actions"><button class="btn-soft" onclick="resetCard(['c2_v1','c2_v2'], ['c2_res'], ['0%'])">Pulisci</button></div>
+        </article>
+
+        <article class="card">
+          <div class="card-top">
+            <div>
+              <h3>Calcolo del totale</h3>
+              <p>Ricava il totale da quota e percentuale.</p>
+            </div>
+            <div class="icon icon-violet">Σ</div>
+          </div>
+          <div class="fields two">
+            <label><span>Percentuale (%)</span><input type="number" id="c3_p" placeholder="99" oninput="calcolaCard3()"></label>
+            <label><span>Valore</span><input type="number" id="c3_q" placeholder="99" oninput="calcolaCard3()"></label>
+          </div>
+          <div class="result"><div class="result-label">Totale</div><div id="c3_res" class="result-value">0</div></div>
+          <div class="actions"><button class="btn-soft" onclick="resetCard(['c3_p','c3_q'], ['c3_res'], ['0'])">Pulisci</button></div>
+        </article>
+      </div>
+    </section>
+
+    <section style="margin-top: 28px;">
+      <div class="section-head">
+        <p>Area 2</p>
+        <h2>Investimenti</h2>
+      </div>
+
+      <div class="grid three">
+        <article class="card">
+          <div class="card-top">
+            <div>
+              <h3>Rendimento da patrimonio</h3>
+              <p>Confronta capitale investito e valore attuale.</p>
+            </div>
+            <div class="icon icon-green">↗</div>
+          </div>
+          <div class="fields one">
+            <label><span>Ho investito</span><input type="number" id="inv1" placeholder="112.53" oninput="calcolaRendimentoDaPatrimonio()"></label>
+            <label><span>Ora il patrimonio è</span><input type="number" id="pat1" placeholder="124" oninput="calcolaRendimentoDaPatrimonio()"></label>
+          </div>
+          <div class="result"><div class="result-label">Rendimento</div><div id="rend1" class="result-value">0%</div></div>
+          <div class="actions"><button class="btn-soft" onclick="resetCard(['inv1','pat1'], ['rend1'], ['0%'])">Pulisci</button></div>
+        </article>
+
+        <article class="card">
+          <div class="card-top">
+            <div>
+              <h3>Rendimento da guadagno</h3>
+              <p>Parte dal profitto per stimare la resa.</p>
+            </div>
+            <div class="icon icon-cyan">€</div>
+          </div>
+          <div class="fields one">
+            <label><span>Ho investito</span><input type="number" id="inv2" placeholder="2000" oninput="calcolaRendimentoDaGuadagno()"></label>
+            <label><span>E ho guadagnato</span><input type="number" id="gua2" placeholder="2000" oninput="calcolaRendimentoDaGuadagno()"></label>
+          </div>
+          <div class="split-results">
+            <div class="result"><div class="result-label">Rendimento</div><div id="rend2" class="result-value">0%</div></div>
+            <div class="result secondary"><div class="result-label">Patrimonio finale</div><div id="pat2" class="result-value">0</div></div>
+          </div>
+          <div class="actions"><button class="btn-soft" onclick="resetCard(['inv2','gua2'], ['rend2','pat2'], ['0%','0'])">Pulisci</button></div>
+        </article>
+
+        <article class="card">
+          <div class="card-top">
+            <div>
+              <h3>Spread Bid / Ask</h3>
+              <p>Mostra differenza assoluta e relativa.</p>
+            </div>
+            <div class="icon icon-rose">⇄</div>
+          </div>
+          <div class="fields two">
+            <label><span>Bid</span><input type="number" id="bid" placeholder="163.55" oninput="calcolaSpread()"></label>
+            <label><span>Ask</span><input type="number" id="ask" placeholder="163.71" oninput="calcolaSpread()"></label>
+          </div>
+          <div class="split-results">
+            <div class="result"><div class="result-label">Spread assoluto</div><div id="spread_ass" class="result-value">0</div></div>
+            <div class="result secondary"><div class="result-label">Spread %</div><div id="spread_perc" class="result-value">0%</div></div>
+          </div>
+          <div class="actions"><button class="btn-soft" onclick="resetCard(['bid','ask'], ['spread_ass','spread_perc'], ['0','0%'])">Pulisci</button></div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function val(id) {
+      return parseFloat(document.getElementById(id).value) || 0;
+    }
+
+    function formatNum(n, digits = 2) {
+      return n.toLocaleString('it-IT', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: digits
+      });
+    }
+
+    function setValue(id, value) {
+      document.getElementById(id).textContent = value;
+    }
+
+    function calcolaCard1() {
+      const p = val('c1_p');
+      const t = val('c1_t');
+      setValue('c1_res', formatNum((p / 100) * t));
+    }
+
+    function calcolaCard2() {
+      const v1 = val('c2_v1');
+      const v2 = val('c2_v2');
+      const res = v2 !== 0 ? (v1 / v2) * 100 : 0;
+      setValue('c2_res', formatNum(res) + '%');
+    }
+
+    function calcolaCard3() {
+      const p = val('c3_p');
+      const q = val('c3_q');
+      const res = p !== 0 ? (q / p) * 100 : 0;
+      setValue('c3_res', formatNum(res));
+    }
+
+    function calcolaRendimentoDaPatrimonio() {
+      const investito = val('inv1');
+      const patrimonio = val('pat1');
+      const rendimento = investito !== 0 ? ((patrimonio - investito) / investito) * 100 : 0;
+      setValue('rend1', formatNum(rendimento) + '%');
+    }
+
+    function calcolaRendimentoDaGuadagno() {
+      const investito = val('inv2');
+      const guadagno = val('gua2');
+      const rendimento = investito !== 0 ? (guadagno / investito) * 100 : 0;
+      const patrimonio = investito + guadagno;
+      setValue('rend2', formatNum(rendimento) + '%');
+      setValue('pat2', formatNum(patrimonio));
+    }
+
+    function calcolaSpread() {
+      const bid = val('bid');
+      const ask = val('ask');
+      const spreadAss = ask - bid;
+      const spreadPerc = bid !== 0 ? (spreadAss / bid) * 100 : 0;
+      setValue('spread_ass', formatNum(spreadAss, 4));
+      setValue('spread_perc', formatNum(spreadPerc, 4) + '%');
+    }
+
+    function resetCard(inputIds, outputIds, defaults) {
+      inputIds.forEach(id => document.getElementById(id).value = '');
+      outputIds.forEach((id, index) => setValue(id, defaults[index]));
+    }
+
+    function resetAll() {
+      resetCard(['c1_p','c1_t'], ['c1_res'], ['0']);
+      resetCard(['c2_v1','c2_v2'], ['c2_res'], ['0%']);
+      resetCard(['c3_p','c3_q'], ['c3_res'], ['0']);
+      resetCard(['inv1','pat1'], ['rend1'], ['0%']);
+      resetCard(['inv2','gua2'], ['rend2','pat2'], ['0%','0']);
+      resetCard(['bid','ask'], ['spread_ass','spread_perc'], ['0','0%']);
+    }
+
+    function fillDemo() {
+      document.getElementById('c1_p').value = 25;
+      document.getElementById('c1_t').value = 11400;
+      calcolaCard1();
+
+      document.getElementById('c2_v1').value = 188;
+      document.getElementById('c2_v2').value = 10000;
+      calcolaCard2();
+
+      document.getElementById('c3_p').value = 99;
+      document.getElementById('c3_q').value = 99;
+      calcolaCard3();
+
+      document.getElementById('inv1').value = 112.53;
+      document.getElementById('pat1').value = 124;
+      calcolaRendimentoDaPatrimonio();
+
+      document.getElementById('inv2').value = 2000;
+      document.getElementById('gua2').value = 2000;
+      calcolaRendimentoDaGuadagno();
+
+      document.getElementById('bid').value = 163.55;
+      document.getElementById('ask').value = 163.71;
+      calcolaSpread();
+    }
+  </script>
+</body>
+</html>
